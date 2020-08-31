@@ -66,18 +66,18 @@
 
 {#if msg && (!blog && !page)}{msg}{/if}
 
-<section class="mw7 center avenir">
+<section class="mw8 pa3 center avenir">
   {#if blog && blog.title}
-    <h1 class="f3 f1-m f-headline-l">
+    <h1 class="f2 f1-m f-headline-l pv2">
       <a class="link" href={`#/${params.slug1}?pub=${pubParam}`}>{blog.title}</a>
     </h1>
   {:else if page && page.title}
-    <h1 class="baskerville fw1 ph3 ph0-l">{page.title}</h1>
+    <h1 class="baskerville fw1 ph3 ph0-l pv2">{page.title}</h1>
   {/if}
 
   {#if page && page.content}
     {#if params.slug1 && params.slug2}
-      <h2 class="f3 f2-m f-subheadline-l measure lh-title fw1 mt0">{page.title}</h2>
+      <h2 class="f2 f2-m f-subheadline-l measure lh-title fw1 mt0 pb2">{page.title}</h2>
     {/if}
     <article>
       {@html page.content}
@@ -88,7 +88,7 @@
       {#if id !== 'title'}
         <article class="bt b--black-10">
           <a
-            class="db pv4 ph3 ph0-l no-underline black dim"
+            class="db pv3 pv4-m ph3-m ph0-l no-underline black dim"
             use:active={`/${params.slug1}/${slug}(.*)`}
             href={`#/${params.slug1}/${slug}?pub=${pubParam}`}>
             <div class="flex flex-column flex-row-ns">
