@@ -1,7 +1,7 @@
 <script>
   import { onMount } from 'svelte'
   import qs from 'qs'
-  import { link, querystring } from 'svelte-spa-router'
+  import { querystring } from 'svelte-spa-router'
   import active from 'svelte-spa-router/active'
   import { gun } from './contexts.js'
   import { getNode } from './stores.js'
@@ -16,7 +16,6 @@
 
   onMount(() => {
     const { pub } = qs.parse($querystring)
-    console.log($querystring)
     if (location.hostname === 'localhost' && !pub) {
       msg = 'cannot load'
     } else {
@@ -30,26 +29,21 @@
   function fetchNote (params, user) {
     if (!user) return
     const { slug1, slug2 } = params
-    console.log('fetch....')
-    console.log(params)
-    msg = 'loading...'
     user
       .get('slugs')
       .get(slug1)
-      .once(pathFromSlug => {
-        console.log(pathFromSlug)
-        getNode(pathFromSlug, user).once(node => {
+      .on(pathFromSlug => {
+        getNode(pathFromSlug, user).on(node => {
           blog = {
             title: node.title
           }
           if (node.type === 'folder') {
             // load list of files
-            page = {}
+            page = null
             getNode(pathFromSlug, user)
               .get('children')
               .map()
-              .once((pageNode, id) => {
-                console.log(pageNode)
+              .on((pageNode, id) => {
                 if (pageNode.mode === 'public' && pageNode.slug) {
                   blog[id] = pageNode
                   if (slug2 && pageNode.slug === slug2) {
@@ -59,8 +53,9 @@
               })
           } else {
             // load file
-            page = {}
-            getNode(pathFromSlug, user).once(pageNode => {
+            blog = null
+            console.log('blog null')
+            getNode(pathFromSlug, user).on(pageNode => {
               page = pageNode
             })
           }
@@ -74,7 +69,7 @@
 <section class="mw7 center avenir">
   {#if blog && blog.title}
     <h1 class="f3 f1-m f-headline-l">
-      <a class="link" use:link href={`/${params.slug1}?pub=${pubParam}`}>{blog.title}</a>
+      <a class="link" href={`#/${params.slug1}?pub=${pubParam}`}>{blog.title}</a>
     </h1>
   {:else if page && page.title}
     <h1 class="baskerville fw1 ph3 ph0-l">{page.title}</h1>
@@ -87,15 +82,15 @@
     <article>
       {@html page.content}
     </article>
-  {:else if blog}
+  {/if}
+  {#if blog && !page}
     {#each Object.entries(blog) as [id, { title, content, slug }]}
       {#if id !== 'title'}
         <article class="bt b--black-10">
           <a
             class="db pv4 ph3 ph0-l no-underline black dim"
             use:active={`/${params.slug1}/${slug}(.*)`}
-            use:link
-            href={`/${params.slug1}/${slug}?pub=${pubParam}`}>
+            href={`#/${params.slug1}/${slug}?pub=${pubParam}`}>
             <div class="flex flex-column flex-row-ns">
               <h1 class="f3 fw1 baskerville mt0 lh-title">{title}</h1>
             </div>
