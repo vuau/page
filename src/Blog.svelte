@@ -1,5 +1,4 @@
 <script>
-  import { onMount } from 'svelte'
   import qs from 'qs'
   import { querystring } from 'svelte-spa-router'
   import active from 'svelte-spa-router/active'
@@ -10,25 +9,69 @@
 
   let blog
   let page
-  let pubParam
+
+  let info = {}
   let user
   let msg
 
-  onMount(() => {
-    const { pub } = qs.parse($querystring)
-    if (location.hostname === 'localhost' && !pub) {
-      msg = 'cannot load'
-    } else {
-      pubParam = pub
-      user = gun.user(pub)
+  const isProd = process.env.NODE_ENV === 'production'
+  const hasCustomDomain =
+    location.hostname !== 'localhost' && location.hostname !== 'nicepage.now.sh'
+
+  const domainPub = isProd
+    ? 'UUvt2FxUhDgixqNwjoDVo6g0HBZ5aoxYnrilZrQeG-c.V43xuAgfPrijpatwhdPIEVqhORsfOtpnE_QhrubF5bw'
+    : 'knekjvdWMF1vqCkF4kD99R22HKXP5zjxA-DeM4BBIX0.liPyrUDutaxA8UVxaC45a6c_EfXfrN2UXna_7MrCip0'
+
+  function getBlogURL () {
+    if (hasCustomDomain) {
+      return '#/'
     }
-  })
+    return `#/${info.slug1}?pub=${info.pub}`
+  }
 
-  $: fetchNote(params, user)
+  function getPageURL (slug) {
+    if (hasCustomDomain) {
+      return `#/${slug}`
+    }
+    return `#/${info.slug1}/${slug}?pub=${info.pub}`
+  }
 
-  function fetchNote (params, user) {
+  $: fetchNote(params)
+
+  async function fetchNote (params) {
+    if (hasCustomDomain) {
+      const domainUser = gun.user(domainPub)
+      const hostname = location.hostname
+      const domainInfo = await domainUser.get(hostname).then()
+      if (!domainInfo) {
+        msg = 'cannot load'
+        return
+      }
+      info = {
+        pub: domainInfo.pub,
+        slug1: domainInfo.slug,
+        slug2: params.slug1
+      }
+    } else {
+      const { pub } = qs.parse($querystring)
+      if (!pub) {
+        msg = 'cannot load'
+        return
+      }
+      info = {
+        pub,
+        slug1: params.slug1,
+        slug2: params.slug2
+      }
+    }
+
+    user = gun.user(info.pub)
+
+    console.log('fetch', info)
+
     if (!user) return
-    const { slug1, slug2 } = params
+
+    const { slug1, slug2 } = info
     user
       .get('slugs')
       .get(slug1)
@@ -54,7 +97,6 @@
           } else {
             // load file
             blog = null
-            console.log('blog null')
             getNode(pathFromSlug, user).on(pageNode => {
               page = pageNode
             })
@@ -64,20 +106,22 @@
   }
 </script>
 
-{#if msg && (!blog && !page)}{msg}{/if}
+{#if msg && !blog && !page}{msg}{/if}
 
 <section class="mw8 pa3 center avenir">
   {#if blog && blog.title}
     <h1 class="f2 f1-m f-headline-l pv2">
-      <a class="link" href={`#/${params.slug1}?pub=${pubParam}`}>{blog.title}</a>
+      <a class="link" href={getBlogURL()}>{blog.title}</a>
     </h1>
   {:else if page && page.title}
     <h1 class="baskerville fw1 ph3 ph0-l pv2">{page.title}</h1>
   {/if}
 
   {#if page && page.content}
-    {#if params.slug1 && params.slug2}
-      <h2 class="f2 f2-m f-subheadline-l measure lh-title fw1 mt0 pb2">{page.title}</h2>
+    {#if info.slug1 && info.slug2}
+      <h2 class="f2 f2-m f-subheadline-l measure lh-title fw1 mt0 pb2">
+        {page.title}
+      </h2>
     {/if}
     <article>
       {@html page.content}
@@ -88,9 +132,9 @@
       {#if id !== 'title'}
         <article class="bt b--black-10">
           <a
-            class="db pv3 pv4-m ph3-m ph0-l no-underline black dim"
-            use:active={`/${params.slug1}/${slug}(.*)`}
-            href={`#/${params.slug1}/${slug}?pub=${pubParam}`}>
+            class="db pv3 pv4-ns no-underline black dim"
+            use:active={`/${info.slug1}/${slug}(.*)`}
+            href={getPageURL(slug)}>
             <div class="flex flex-column flex-row-ns">
               <h1 class="f3 fw1 baskerville mt0 lh-title">{title}</h1>
             </div>
