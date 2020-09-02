@@ -67,44 +67,40 @@
 
     user = gun.user(info.pub)
 
-    console.log('fetch', info)
-
     if (!user) return
 
     const { slug1, slug2 } = info
-    user
-      .get('slugs')
-      .get(slug1)
-      .on(pathFromSlug => {
-        getNode(pathFromSlug, user).on(node => {
-          if (!node) return
-          blog = {
-            title: node.title,
-            headerTag: node.headerTag
-          }
-          if (node.type === 'folder') {
-            // load list of files
-            page = null
-            getNode(pathFromSlug, user)
-              .get('children')
-              .map()
-              .on((pageNode, id) => {
-                if (pageNode.mode === 'public' && pageNode.slug) {
-                  blog[id] = pageNode
-                  if (slug2 && pageNode.slug === slug2) {
-                    page = pageNode
-                  }
-                }
-              })
-          } else {
-            // load file
-            blog = null
-            getNode(pathFromSlug, user).on(pageNode => {
+    const pathFromSlug = await user.get('slugs').get(slug1).then()
+    const node = await getNode(pathFromSlug, user).then()
+
+    if (!node) return
+
+    blog = {
+      title: node.title,
+      headerTag: node.headerTag
+    }
+
+    if (node.type === 'folder') {
+      // load list of files
+      page = null
+      getNode(pathFromSlug, user)
+        .get('children')
+        .map()
+        .on((pageNode, id) => {
+          if (pageNode.mode === 'public' && pageNode.slug) {
+            blog[id] = pageNode
+            if (slug2 && pageNode.slug === slug2) {
               page = pageNode
-            })
+            }
           }
         })
+    } else {
+      // load file
+      blog = null
+      getNode(pathFromSlug, user).on(pageNode => {
+        page = pageNode
       })
+    }
   }
 </script>
 
