@@ -77,6 +77,7 @@
       .get(slug1)
       .on(pathFromSlug => {
         getNode(pathFromSlug, user).on(node => {
+          if (!node) return
           blog = {
             title: node.title,
             headerTag: node.headerTag
