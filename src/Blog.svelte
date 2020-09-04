@@ -112,6 +112,10 @@
 
 {#if msg && !blog && !page}{msg}{/if}
 
+<svelte:head>
+  <title>{blog ? `${blog.title}${page ? ' - ' : ''}` : ''}{page ? `${page.title}` : ''}</title>
+</svelte:head>
+
 <section class="mw8 pa3 center avenir">
   {#if blog && blog.title}
     <h1 class="f2 f1-m f-headline-l pv2">
