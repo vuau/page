@@ -13,6 +13,7 @@
   let info = {}
   let user
   let msg
+  let isDoneAppend
 
   const isProd = process.env.NODE_ENV === 'production'
   const hasCustomDomain =
@@ -92,6 +93,11 @@
             if (slug2 && pageNode.slug === slug2) {
               page = pageNode
             }
+            if (blog.headerTag && !isDoneAppend) {
+              const doc = document.createRange().createContextualFragment(blog.headerTag)
+              document.head.appendChild(doc)
+              isDoneAppend = true
+            }
           }
         })
     } else {
@@ -105,12 +111,6 @@
 </script>
 
 {#if msg && !blog && !page}{msg}{/if}
-
-<svelte:head>
-  {#if blog && !page}
-   {@html blog.headerTag}
-  {/if}
-</svelte:head>
 
 <section class="mw8 pa3 center avenir">
   {#if blog && blog.title}
