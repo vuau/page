@@ -1,11 +1,12 @@
 <script>
-  import qs from 'qs'
-  import { querystring } from 'svelte-spa-router'
-  import active from 'svelte-spa-router/active'
+  import { navigate } from 'svelte-routing'
   import { gun } from './contexts.js'
   import { getNode } from './stores.js'
 
-  export let params = {}
+
+  export let slug1
+  export let slug2
+  export let pub
 
   let blog
   let page
@@ -25,19 +26,19 @@
 
   function getBlogURL () {
     if (hasCustomDomain) {
-      return '#/'
+      return '/'
     }
-    return `#/${info.slug1}?pub=${info.pub}`
+    return `/${info.slug1}/${info.pub}`
   }
 
   function getPageURL (slug) {
     if (hasCustomDomain) {
-      return `#/${slug}`
+      return `/${slug}`
     }
-    return `#/${info.slug1}/${slug}?pub=${info.pub}`
+    return `/${info.slug1}/${slug}/${info.pub}`
   }
 
-  $: fetchNote(params)
+  $: fetchNote({ slug1, slug2, pub })
 
   async function fetchNote (params) {
     if (hasCustomDomain) {
@@ -54,7 +55,6 @@
         slug2: params.slug1
       }
     } else {
-      const { pub } = qs.parse($querystring)
       if (!pub) {
         msg = 'cannot load'
         return
@@ -71,7 +71,10 @@
     if (!user) return
 
     const { slug1, slug2 } = info
-    const pathFromSlug = await user.get('slugs').get(slug1).then()
+    const pathFromSlug = await user
+      .get('slugs')
+      .get(slug1)
+      .then()
     const node = await getNode(pathFromSlug, user).then()
 
     if (!node) return
@@ -94,7 +97,9 @@
               page = pageNode
             }
             if (blog.headerTag && !isDoneAppend) {
-              const doc = document.createRange().createContextualFragment(blog.headerTag)
+              const doc = document
+                .createRange()
+                .createContextualFragment(blog.headerTag)
               document.head.appendChild(doc)
               isDoneAppend = true
             }
@@ -108,18 +113,28 @@
       })
     }
   }
+  function clickPage (href) {
+    navigate(href, { replace: true })
+  }
 </script>
 
 {#if msg && !blog && !page}{msg}{/if}
 
 <svelte:head>
-  <title>{blog ? `${blog.title}${page ? ' - ' : ''}` : ''}{page ? `${page.title}` : ''}</title>
+  <title>
+    {blog ? `${blog.title}${page ? ' - ' : ''}` : ''}{page ? `${page.title}` : ''}
+  </title>
 </svelte:head>
 
 <section class="mw8 pa3 center avenir">
   {#if blog && blog.title}
     <h1 class="f2 f1-m f-headline-l pv2">
-      <a class="link" href={getBlogURL()}>{blog.title}</a>
+      <a
+        on:click|preventDefault={() => clickPage(getBlogURL())}
+        class="link"
+        href={getBlogURL()}>
+        {blog.title}
+      </a>
     </h1>
   {:else if page && page.title}
     <h1 class="baskerville fw1 ph3 ph0-l pv2">{page.title}</h1>
@@ -140,8 +155,8 @@
       {#if !['title', 'headerTag'].includes(id)}
         <article class="bt b--black-10">
           <a
+            on:click|preventDefault={() => clickPage(getPageURL(slug))}
             class="db pv3 pv4-ns no-underline black dim"
-            use:active={`/${info.slug1}/${slug}(.*)`}
             href={getPageURL(slug)}>
             <div class="flex flex-column flex-row-ns">
               <h1 class="f3 fw1 baskerville mt0 lh-title">{title}</h1>
@@ -152,6 +167,9 @@
     {/each}
   {/if}
   <footer class="pv4 bt b--black-10 black-70">
-    <p class="f6 db b lh-solid">© Powered by <a class="link" href="https://github.com/vuau/pen">Pen</a></p>
+    <p class="f6 db b lh-solid">
+      © Powered by
+      <a class="link" href="https://github.com/vuau/pen">Pen</a>
+    </p>
   </footer>
 </section>

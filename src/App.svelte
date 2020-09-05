@@ -1,11 +1,10 @@
 <script>
-  import Router from 'svelte-spa-router'
+  import { Router, Route } from 'svelte-routing'
   import Blog from './Blog.svelte'
-  const routes = {
-    '/:slug1/:slug2': Blog,
-    '/:slug1': Blog,
-    '/': Blog
-  }
 </script>
 
-<Router {routes} />
+<Router>
+  <Route path=":slug1/:slug2/:pub" component={Blog} />
+  <Route path=":slug1/:pub" component={Blog} />
+  <Route path="/" component={Blog} />
+</Router>
