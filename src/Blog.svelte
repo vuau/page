@@ -46,7 +46,7 @@
       const hostname = location.hostname
       const domainInfo = await domainUser.get(hostname).then()
       if (!domainInfo) {
-        msg = 'cannot load'
+        msg = '404 Not Found!'
         return
       }
       info = {
@@ -56,7 +56,7 @@
       }
     } else {
       if (!pub) {
-        msg = 'cannot load'
+        msg = '404 Not Found!'
         return
       }
       info = {
@@ -114,11 +114,10 @@
     }
   }
   function clickPage (href) {
-    navigate(href, { replace: true })
+    navigate(href)
+    window.scrollTo(0, 0)
   }
 </script>
-
-{#if msg && !blog && !page}{msg}{/if}
 
 <svelte:head>
   <title>
@@ -127,6 +126,9 @@
 </svelte:head>
 
 <section class="mw8 pa3 center avenir">
+  {#if msg && !blog && !page}
+    <h1 class="baskerville fw1 ph3 ph0-l pv4">{msg}</h1>
+  {/if}
   {#if blog && blog.title}
     <h1 class="f2 f1-m f-headline-l pv2">
       <a

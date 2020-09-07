@@ -2,6 +2,7 @@
   "version": 2,
   "regions": ["sin1"],
   "routes": [
-   { "src": "/(.*)", "dest": "/index.html" }
+    { "handle": "filesystem" },
+    { "src": "/.*", "dest": "/" }
   ]
 }

@@ -6,5 +6,6 @@
 <Router>
   <Route path=":slug1/:slug2/:pub" component={Blog} />
   <Route path=":slug1/:pub" component={Blog} />
+  <Route path=":slug1" component={Blog} />
   <Route path="/" component={Blog} />
 </Router>
