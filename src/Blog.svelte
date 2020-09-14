@@ -21,7 +21,7 @@
     location.hostname !== 'localhost' && location.hostname !== 'nicepage.now.sh'
 
   const domainPub = isProd
-    ? 'UUvt2FxUhDgixqNwjoDVo6g0HBZ5aoxYnrilZrQeG-c.V43xuAgfPrijpatwhdPIEVqhORsfOtpnE_QhrubF5bw'
+    ? 'Xqmxi6SGky0_z4tsJWe7k7Qv_vuA1f4dZgAXlYEf7v0.8mhipfPibCwaqaJ3GxqcVmWPpHRj6YPLhxyEUDzOiGM'
     : 'knekjvdWMF1vqCkF4kD99R22HKXP5zjxA-DeM4BBIX0.liPyrUDutaxA8UVxaC45a6c_EfXfrN2UXna_7MrCip0'
 
   function getBlogURL () {
