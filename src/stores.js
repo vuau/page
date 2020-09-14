@@ -10,7 +10,7 @@ export const getParentNode = (path, root = gunUser) => {
 }
 
 export const getParentPath = (path) => {
-  let parts = path.split('_') // eslint-disable-line
+  let parts = (path || '').split('_') // eslint-disable-line
   const id = parts.pop()
   const parentPath = parts.join('_')
   return [id, parentPath]
