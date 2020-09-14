@@ -3,7 +3,6 @@
   import { gun } from './contexts.js'
   import { getNode } from './stores.js'
 
-
   export let slug1
   export let slug2
   export let pub
@@ -16,35 +15,37 @@
   let msg
   let isDoneAppend
 
-  const isProd = process.env.NODE_ENV === 'production'
-  const hasCustomDomain =
-    location.hostname !== 'localhost' && location.hostname !== 'nicepage.now.sh'
+  const DOMAINS = {
+    'vuau.me': {
+      pub: 'J6ul10B2pvF1kr0ddHiEqtHbSsbzT06RtDQiJj90VhI.mQ5Ac2NgzzXGor_zgc0Hngl2-LVEN5frIhMju5r1HRc',
+      slug: 'blog'
+    }
+  }
 
-  const domainPub = isProd
-    ? 'Xqmxi6SGky0_z4tsJWe7k7Qv_vuA1f4dZgAXlYEf7v0.8mhipfPibCwaqaJ3GxqcVmWPpHRj6YPLhxyEUDzOiGM'
-    : 'knekjvdWMF1vqCkF4kD99R22HKXP5zjxA-DeM4BBIX0.liPyrUDutaxA8UVxaC45a6c_EfXfrN2UXna_7MrCip0'
+  const hasCustomDomain =
+    location.hostname !== 'localhost' &&
+    !location.hostname.includes('depen')
 
   function getBlogURL () {
     if (hasCustomDomain) {
       return '/'
     }
-    return `/${info.slug1}/${info.pub}`
+    return `/${info.slug1}`
   }
 
   function getPageURL (slug) {
     if (hasCustomDomain) {
       return `/${slug}`
     }
-    return `/${info.slug1}/${slug}/${info.pub}`
+    return `/${info.slug1}/${slug}`
   }
 
   $: fetchNote({ slug1, slug2, pub })
 
   async function fetchNote (params) {
+    const hostname = location.hostname
     if (hasCustomDomain) {
-      const domainUser = gun.user(domainPub)
-      const hostname = location.hostname
-      const domainInfo = await domainUser.get(hostname).then()
+      const domainInfo = DOMAINS[hostname]
       if (!domainInfo) {
         msg = '404 Not Found!'
         return
@@ -55,6 +56,15 @@
         slug2: params.slug1
       }
     } else {
+      // get pub from alias
+      const alias = hostname.split('.')[0]
+      console.log(alias)
+      const userPub = await new Promise(resolve => {
+        gun
+          .get(`~@${alias}`)
+          .once(data => resolve(Object.keys(data._['>'])[0]))
+      })
+      pub = userPub.split('~')[1]
       if (!pub) {
         msg = '404 Not Found!'
         return
@@ -153,15 +163,15 @@
     </article>
   {/if}
   {#if blog && !page}
-    {#each Object.entries(blog) as [id, { title, content, slug }]}
+    {#each Object.entries(blog) as [id, data]}
       {#if !['title', 'headerTag'].includes(id)}
         <article class="bt b--black-10">
           <a
-            on:click|preventDefault={() => clickPage(getPageURL(slug))}
+            on:click|preventDefault={() => clickPage(getPageURL(data.slug))}
             class="db pv3 pv4-ns no-underline black dim"
-            href={getPageURL(slug)}>
+            href={getPageURL(data.slug)}>
             <div class="flex flex-column flex-row-ns">
-              <h1 class="f3 fw1 baskerville mt0 lh-title">{title}</h1>
+              <h1 class="f3 fw1 baskerville mt0 lh-title">{data.title}</h1>
             </div>
           </a>
         </article>

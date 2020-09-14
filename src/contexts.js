@@ -3,13 +3,17 @@ import SEA from 'gun/sea'
 import 'gun/lib/not'
 import 'gun/lib/then'
 
-let gun
+let peers
 
 if (process.env.NODE_ENV === 'production') {
-  gun = Gun(['https://pensync.glitch.me/gun'])
+  peers = Gun(['https://pensync.glitch.me/gun'])
 } else {
-  gun = Gun(['http://localhost:8765/gun'])
+  peers = ['http://localhost:8765/gun']
 }
+
+const gun = new Gun({
+  peers
+})
 
 const gunUser = gun.user()
 
