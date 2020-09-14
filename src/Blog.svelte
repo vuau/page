@@ -153,15 +153,15 @@
     </article>
   {/if}
   {#if blog && !page}
-    {#each Object.entries(blog) as [id, { title, content, slug }]}
+    {#each Object.entries(blog) as [id, data]}
       {#if !['title', 'headerTag'].includes(id)}
         <article class="bt b--black-10">
           <a
-            on:click|preventDefault={() => clickPage(getPageURL(slug))}
+            on:click|preventDefault={() => clickPage(getPageURL(data.slug))}
             class="db pv3 pv4-ns no-underline black dim"
-            href={getPageURL(slug)}>
+            href={getPageURL(data.slug)}>
             <div class="flex flex-column flex-row-ns">
-              <h1 class="f3 fw1 baskerville mt0 lh-title">{title}</h1>
+              <h1 class="f3 fw1 baskerville mt0 lh-title">{data.title}</h1>
             </div>
           </a>
         </article>
