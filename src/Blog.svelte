@@ -7,38 +7,63 @@
   export let slug2
   export let pub
 
-  let user, path, blog, pages
+  let user, path, blog, pages, page, isLoading
 
   onMount(() => {
+    isLoading = true
     user = gun.user(pub)
     user.get('slugs')
       .get(slug1)
-      .once(v => {
+      .on(v => {
         path = v
-        getData()
+        if (path) {
+          getData()
+        }
       })
   })
+
   function getData () {
-    getNode(path, user).once((node, id) => {
+    getNode(path, user).on((node, id) => {
       console.log(node)
       if (!node) return
-      blog = node
-      blog = blog
-      pages = []
-      getNode(path, user).get('children').map().once(node => {
-        console.log('vo', node)
-        pages.push(node)
-        pages = pages
-      })
+      if (node.type === 'folder') {
+        blog = node
+        pages = {}
+        getNode(path, user).get('children').map().on((node, id) => {
+          if (node && node.mode === 'public') {
+            pages[id] = node
+            console.log(node.slug, slug2)
+            if (node.slug === slug2) {
+              page = node
+              isLoading = false
+            }
+            // reactive
+            pages = pages
+            isLoading = false
+          }
+        })
+      }
     })
   }
 </script>
 
-{#if blog}
-  <div>{blog.title} --- {path}</div>
-  {#if pages}
-    {#each pages as page}
-      <div>{page.title}</div>
-    {/each}
+{#if isLoading}
+  Loading...
+{:else}
+  {#if slug2 && page}
+    {@html page.content}
+  {/if}
+  {#if !slug2 && blog}
+    <div>{blog.title} --- {path}</div>
+    {#if pages}
+      {#each Object.values(pages) as page}
+        <div>
+          <a href={`/${slug1}/${page.slug}/${pub}`}>{page.title}</a>
+        </div>
+      {/each}
+    {/if}
+  {/if}
+  {#if !blog && !page}
+    Not found!
   {/if}
 {/if}
