@@ -1,121 +1,67 @@
 <script>
   import { navigate } from 'svelte-routing'
+  import { onMount } from 'svelte'
   import { gun } from './contexts.js'
   import { getNode } from './stores.js'
-
-
   export let slug1
   export let slug2
   export let pub
 
-  let blog
-  let page
-
-  let info = {}
-  let user
-  let msg
-  let isDoneAppend
-
-  const isProd = process.env.NODE_ENV === 'production'
-  const hasCustomDomain =
-    location.hostname !== 'localhost' && location.hostname !== 'nicepage.now.sh'
-
-  const domainPub = isProd
-    ? 'Xqmxi6SGky0_z4tsJWe7k7Qv_vuA1f4dZgAXlYEf7v0.8mhipfPibCwaqaJ3GxqcVmWPpHRj6YPLhxyEUDzOiGM'
-    : 'knekjvdWMF1vqCkF4kD99R22HKXP5zjxA-DeM4BBIX0.liPyrUDutaxA8UVxaC45a6c_EfXfrN2UXna_7MrCip0'
-
-  function getBlogURL () {
-    if (hasCustomDomain) {
-      return '/'
-    }
-    return `/${info.slug1}/${info.pub}`
-  }
-
-  function getPageURL (slug) {
-    if (hasCustomDomain) {
-      return `/${slug}`
-    }
-    return `/${info.slug1}/${slug}/${info.pub}`
-  }
-
-  $: fetchNote({ slug1, slug2, pub })
-
-  async function fetchNote (params) {
-    if (hasCustomDomain) {
-      const domainUser = gun.user(domainPub)
-      const hostname = location.hostname
-      const domainInfo = await domainUser.get(hostname).then()
-      if (!domainInfo) {
-        msg = '404 Not Found!'
-        return
-      }
-      info = {
-        pub: domainInfo.pub,
-        slug1: domainInfo.slug,
-        slug2: params.slug1
-      }
-    } else {
-      if (!pub) {
-        msg = '404 Not Found!'
-        return
-      }
-      info = {
-        pub,
-        slug1: params.slug1,
-        slug2: params.slug2
-      }
-    }
-
-    user = gun.user(info.pub)
-
-    if (!user) return
-
-    const { slug1, slug2 } = info
-    const pathFromSlug = await user
+  let user, path, blog, pages, page, isLoading, isDoneAppend
+  onMount(() => {
+    isLoading = true
+    user = gun.user(pub)
+    user
       .get('slugs')
       .get(slug1)
-      .then()
-    const node = await getNode(pathFromSlug, user).then()
-
-    if (!node) return
-
-    blog = {
-      title: node.title,
-      headerTag: node.headerTag
-    }
-
-    if (node.type === 'folder') {
-      // load list of files
-      page = null
-      getNode(pathFromSlug, user)
-        .get('children')
-        .map()
-        .on((pageNode, id) => {
-          if (pageNode.mode === 'public' && pageNode.slug) {
-            blog[id] = pageNode
-            if (slug2 && pageNode.slug === slug2) {
-              page = pageNode
-            }
-            if (blog.headerTag && !isDoneAppend) {
-              const doc = document
-                .createRange()
-                .createContextualFragment(blog.headerTag)
-              document.head.appendChild(doc)
-              isDoneAppend = true
-            }
-          }
-        })
-    } else {
-      // load file
-      blog = null
-      getNode(pathFromSlug, user).on(pageNode => {
-        page = pageNode
+      .on(v => {
+        path = v
+        if (path) {
+          getData()
+        }
       })
-    }
-  }
+  })
   function clickPage (href) {
     navigate(href)
     window.scrollTo(0, 0)
+  }
+  function getBlogURL () {
+    return `/${slug1}/${pub}`
+  }
+  function getPageURL (slug) {
+    return `/${slug1}/${slug}/${pub}`
+  }
+  function getData () {
+    getNode(path, user).on(node => {
+      if (!node) return
+      if (node.type === 'folder') {
+        blog = node
+        if (blog.headerTag && !isDoneAppend) {
+          const doc = document
+            .createRange()
+            .createContextualFragment(blog.headerTag)
+          document.head.appendChild(doc)
+          isDoneAppend = true
+        }
+        pages = {}
+        getNode(path, user)
+          .get('children')
+          .map()
+          .on((node, id) => {
+            if (node && node.mode === 'public') {
+              pages[id] = node
+              console.log(node.slug, slug2)
+              if (node.slug === slug2) {
+                page = node
+                isLoading = false
+              }
+              // reactive
+              pages = pages
+              isLoading = false
+            }
+          })
+      }
+    })
   }
 </script>
 
@@ -126,47 +72,49 @@
 </svelte:head>
 
 <section class="mw8 pa3 center avenir">
-  {#if msg && !blog && !page}
-    <h1 class="baskerville fw1 ph3 ph0-l pv4">{msg}</h1>
-  {/if}
-  {#if blog && blog.title}
-    <h1 class="f2 f1-m f-headline-l pv2">
-      <a
-        on:click|preventDefault={() => clickPage(getBlogURL())}
-        class="link"
-        href={getBlogURL()}>
-        {blog.title}
-      </a>
-    </h1>
-  {:else if page && page.title}
-    <h1 class="baskerville fw1 ph3 ph0-l pv2">{page.title}</h1>
-  {/if}
-
-  {#if page && page.content}
-    {#if info.slug1 && info.slug2}
-      <h2 class="f2 f2-m f-subheadline-l measure lh-title fw1 mt0 pb2">
-        {page.title}
-      </h2>
+  {#if isLoading}
+    Loading...
+  {:else}
+    {#if blog && blog.title}
+      <h1 class="f2 f1-m f-headline-l pv2">
+        <a
+          on:click|preventDefault={() => clickPage(getBlogURL())}
+          class="link"
+          href={getBlogURL()}>
+          {blog.title}
+        </a>
+      </h1>
+    {:else if page && page.title}
+      <h1 class="baskerville fw1 ph3 ph0-l pv2">{page.title}</h1>
     {/if}
-    <article>
-      {@html page.content}
-    </article>
-  {/if}
-  {#if blog && !page}
-    {#each Object.entries(blog) as [id, data]}
-      {#if !['title', 'headerTag'].includes(id)}
-        <article class="bt b--black-10">
-          <a
-            on:click|preventDefault={() => clickPage(getPageURL(data.slug))}
-            class="db pv3 pv4-ns no-underline black dim"
-            href={getPageURL(data.slug)}>
-            <div class="flex flex-column flex-row-ns">
-              <h1 class="f3 fw1 baskerville mt0 lh-title">{data.title}</h1>
-            </div>
-          </a>
-        </article>
+
+    {#if slug2 && page}
+      {#if slug1 && slug2}
+        <h2 class="f2 f2-m f-subheadline-l measure lh-title fw1 mt0 pb2">
+          {page.title}
+        </h2>
       {/if}
-    {/each}
+      <article>
+        {@html page.content}
+      </article>
+    {/if}
+    {#if !slug2 && blog}
+      {#if pages}
+        {#each Object.values(pages) as page}
+          <article class="bt b--black-10">
+            <a
+              on:click|preventDefault={() => clickPage(getPageURL(page.slug))}
+              class="db pv3 pv4-ns no-underline black dim"
+              href={getPageURL(page.slug)}>
+              <div class="flex flex-column flex-row-ns">
+                <h1 class="f3 fw1 baskerville mt0 lh-title">{page.title}</h1>
+              </div>
+            </a>
+          </article>
+        {/each}
+      {/if}
+    {/if}
+    {#if !blog && !page}Not found!{/if}
   {/if}
   <footer class="pv4 bt b--black-10 black-70">
     <p class="f6 db b lh-solid">

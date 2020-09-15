@@ -5,7 +5,7 @@ import 'gun/lib/then'
 
 let gun
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV !== 'production') {
   gun = Gun(['https://pensync.glitch.me/gun'])
 } else {
   gun = Gun(['http://localhost:8765/gun'])
