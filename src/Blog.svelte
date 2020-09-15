@@ -50,7 +50,6 @@
           .on((node, id) => {
             if (node && node.mode === 'public') {
               pages[id] = node
-              console.log(node.slug, slug2)
               if (node.slug === slug2) {
                 page = node
                 isLoading = false
