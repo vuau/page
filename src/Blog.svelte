@@ -59,6 +59,16 @@
               isLoading = false
             }
           })
+      } else {
+        page = node
+        if (page.headerTag && !isDoneAppend) {
+          const doc = document
+            .createRange()
+            .createContextualFragment(page.headerTag)
+          document.head.appendChild(doc)
+          isDoneAppend = true
+        }
+        isLoading = false
       }
     })
   }
@@ -84,10 +94,12 @@
         </a>
       </h1>
     {:else if page && page.title}
-      <h1 class="baskerville fw1 ph3 ph0-l pv2">{page.title}</h1>
+      <h2 class="f2 f2-m f-subheadline-l measure lh-title fw1 mt0 pb2">
+        {page.title}
+      </h2>
     {/if}
 
-    {#if slug2 && page}
+    {#if page}
       {#if slug1 && slug2}
         <h2 class="f2 f2-m f-subheadline-l measure lh-title fw1 mt0 pb2">
           {page.title}
