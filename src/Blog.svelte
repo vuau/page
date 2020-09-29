@@ -130,7 +130,7 @@
   <footer class="pv4 bt b--black-10 black-70">
     <p class="f6 db b lh-solid">
       © Powered by
-      <a class="link" href="https://github.com/vuau/pen">Pen</a>
+      <a class="link" href="https://app.denote.link">deNOTE</a>
     </p>
   </footer>
 </section>
