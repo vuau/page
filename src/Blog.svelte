@@ -11,6 +11,13 @@
 
   onMount(async () => {
     isLoading = true
+    if (window.__DATA__) {
+      console.log(window.__DATA__)
+      ;({ blog, pages, page } = window.__DATA__)
+      isLoading = false
+      window.__DATA__ = null
+      return
+    }
     if (!pub) {
       isUseDomain = true
       const domainInfo = domainMap[location.hostname]

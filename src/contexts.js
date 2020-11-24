@@ -14,9 +14,4 @@ if (process.env.NODE_ENV === 'production') {
 
 const gunUser = gun.user()
 
-window.gun = gun
-if (process.env.NODE_ENV !== 'production') {
-  window.gunUser = gunUser
-}
-
 export { gun, gunUser, SEA }
