@@ -35,8 +35,8 @@ export const getNode = (path, root) => {
 }
 
 // return { blog, pages } if getting a folder, return {...page} otherwise
-export async function getData ({ slug, pub }) {
-  const user = gun.user(pub)
+export async function getData ({ slug, pub }, from = gun) {
+  const user = from.user(pub)
   const getPathFromSlugs = async slug => {
     return await user
       .get('slugs')
@@ -55,7 +55,7 @@ export async function getData ({ slug, pub }) {
     const pages = await Promise.all(
       childKeys.map(async key => (await children.get(key).promOnce()).data)
     )
-    return { blog: nodeData, pages }
+    return { blog: nodeData, pages: pages.filter(p => p.mode === 'public') }
   }
   return { ...nodeData }
 }

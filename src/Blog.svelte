@@ -2,7 +2,7 @@
   import { navigate } from 'svelte-routing'
   import { onMount } from 'svelte'
   import { gun } from './contexts.js'
-  import { getNode, getData, domainMap } from './stores.js'
+  import { getData, domainMap } from './stores.js'
   export let slug1
   export let slug2
   export let pub
@@ -15,6 +15,7 @@
       console.log(window.__DATA__)
       ;({ blog, pages, page } = window.__DATA__)
       isLoading = false
+      isUseDomain = window.isUseDomain
       window.__DATA__ = null
       return
     }
@@ -30,6 +31,7 @@
     }
     if (slug1) {
       ;({ blog, pages } = await getData({ slug: slug1, pub }))
+      console.log({ blog, pages})
       injectHead(blog)
     }
     if (slug2) {
