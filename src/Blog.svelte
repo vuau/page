@@ -2,23 +2,10 @@
   import { navigate } from 'svelte-routing'
   import { onMount } from 'svelte'
   import { gun } from './contexts.js'
-  import { getNode, getData as getData2 } from './stores.js'
+  import { getNode, getData, domainMap } from './stores.js'
   export let slug1
   export let slug2
   export let pub
-
-  const domainMap = {
-    'vuau.me': {
-      pub:
-        'J6ul10B2pvF1kr0ddHiEqtHbSsbzT06RtDQiJj90VhI.mQ5Ac2NgzzXGor_zgc0Hngl2-LVEN5frIhMju5r1HRc',
-      slug: 'blog'
-    },
-    'test.localhost': {
-      pub:
-        '_GUKWWJNelWVKV5XDF4REIXOeTi4z4I0U0RztCKYRkg._aaJK4Rpx9rz4c1vxL8ilmxS9lyT1GGeVG9_ToCmBE8',
-      slug: 'blog'
-    }
-  }
 
   let user, path, blog, pages, page, isAppended, isLoading, isUseDomain
 
@@ -26,7 +13,7 @@
     isLoading = true
     if (!pub) {
       isUseDomain = true
-      const domainInfo = getDomainInfo()
+      const domainInfo = domainMap[location.hostname]
       if (!domainInfo) {
         isLoading = false
         return
@@ -35,11 +22,11 @@
       slug1 = domainInfo.slug
     }
     if (slug1) {
-      ;({ blog, pages } = await getData2({ slug: slug1, pub }))
+      ;({ blog, pages } = await getData({ slug: slug1, pub }))
       injectHead(blog)
     }
     if (slug2) {
-      page = await getData2({ slug: slug2, pub })
+      page = await getData({ slug: slug2, pub })
     }
     isLoading = false
   })
@@ -68,9 +55,6 @@
       return `/${slug}`
     }
     return `/${slug1}/${slug}/${pub}`
-  }
-  function getDomainInfo () {
-    return domainMap[location.hostname]
   }
 </script>
 

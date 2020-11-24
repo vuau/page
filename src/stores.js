@@ -1,5 +1,18 @@
 import { gun } from './contexts'
 
+export const domainMap = {
+  'vuau.me': {
+    pub:
+      'J6ul10B2pvF1kr0ddHiEqtHbSsbzT06RtDQiJj90VhI.mQ5Ac2NgzzXGor_zgc0Hngl2-LVEN5frIhMju5r1HRc',
+    slug: 'blog'
+  },
+  'test.localhost': {
+    pub:
+      '_GUKWWJNelWVKV5XDF4REIXOeTi4z4I0U0RztCKYRkg._aaJK4Rpx9rz4c1vxL8ilmxS9lyT1GGeVG9_ToCmBE8',
+    slug: 'blog'
+  }
+}
+
 export const getParentNode = (path, root) => {
   const parts = (path || '').split('_').filter(p => p !== '')
   let node = root.get('notes')
