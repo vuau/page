@@ -15,7 +15,8 @@ module.exports = async (req, res) => {
   let slug1, slug2, pub, blog, pages, page
   const parts = req.url.split('/').filter(Boolean)
   if (!parts.length || parts.length === 1) {
-    const domainInfo = domainMap[req.hostname]
+    const domain = req.headers['x-forwarded-host'].split(':')[0]
+    const domainInfo = domainMap[domain]
     pub = domainInfo.pub
     slug1 = domainInfo.slug
     slug2 = parts[0]
