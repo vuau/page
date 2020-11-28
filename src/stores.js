@@ -1,7 +1,7 @@
 import { gun } from './contexts'
 
 export const domainMap = {
-  'vuau.localhost': {
+  'vuau.me': {
     pub:
       'J6ul10B2pvF1kr0ddHiEqtHbSsbzT06RtDQiJj90VhI.mQ5Ac2NgzzXGor_zgc0Hngl2-LVEN5frIhMju5r1HRc',
     slug: 'blog'
