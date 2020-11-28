@@ -1,7 +1,7 @@
 import { gun } from './contexts'
 
 export const domainMap = {
-  'vuau.me': {
+  'vuau.localhost': {
     pub:
       'J6ul10B2pvF1kr0ddHiEqtHbSsbzT06RtDQiJj90VhI.mQ5Ac2NgzzXGor_zgc0Hngl2-LVEN5frIhMju5r1HRc',
     slug: 'blog'
@@ -38,24 +38,42 @@ export const getNode = (path, root) => {
 export async function getData ({ slug, pub }) {
   const user = gun.user(pub)
   const getPathFromSlugs = async slug => {
-    return await user
-      .get('slugs')
-      .get(slug)
-      .promOnce()
+    return new Promise(resolve =>
+      user
+        .get('slugs')
+        .get(slug)
+        .on((v, k) => resolve(v))
+    )
   }
   const path = await getPathFromSlugs(slug)
-  const node = getNode(path.data, user)
-  const nodeData = (await node.promOnce()).data
+  const node = getNode(path, user)
+  const nodeData = await new Promise(resolve =>
+    node.on((v, k) => {
+      if (v) resolve(v)
+    })
+  )
 
   if (nodeData.type === 'folder') {
-    const children = node.get('children')
-    const childKeys = Object.keys((await children.promOnce()).data).filter(
-      key => key !== '_'
+    const children = await new Promise(resolve =>
+      node.get('children').on((v, k) => resolve(v))
     )
+    const childKeys = Object.keys(children).filter(key => key !== '_')
     const pages = await Promise.all(
-      childKeys.map(async key => (await children.get(key).promOnce()).data)
+      childKeys.map(
+        key =>
+          new Promise(resolve =>
+            node
+              .get('children')
+              .get(key)
+              .on(v => {
+                if (v) {
+                  resolve(v)
+                }
+              })
+          )
+      )
     )
-    return { blog: nodeData, pages }
+    return { blog: nodeData, pages: pages.filter(p => p.mode === 'public') }
   }
   return { ...nodeData }
 }

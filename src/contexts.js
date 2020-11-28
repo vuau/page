@@ -6,8 +6,8 @@ import '@gooddollar/gun/lib/promise'
 
 let gun
 
-if (process.env.NODE_ENV === 'production') {
-  gun = Gun(['https://pensync.glitch.me/gun', 'https://pvaklb.ddns.net/gun'])
+if (process.env.NODE_ENV !== 'production') {
+  gun = Gun(['https://pensync.glitch.me/gun'])
 } else {
   gun = Gun(['http://localhost:8765/gun'])
 }
