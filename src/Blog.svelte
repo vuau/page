@@ -2,12 +2,12 @@
   import { navigate } from 'svelte-routing'
   import { onMount } from 'svelte'
   import { gun } from './contexts.js'
-  import { getNode, getData, domainMap } from './stores.js'
+  import { getNode, getData, domainMap, isHeadTagUpdated } from './stores.js'
   export let slug1
   export let slug2
   export let pub
 
-  let user, path, blog, pages, page, isAppended, isLoading, isUseDomain
+  let user, path, blog, pages, page, isLoading, isUseDomain
 
   onMount(async () => {
     isLoading = true
@@ -32,12 +32,12 @@
   })
 
   function injectHead (blog) {
-    if (blog.headerTag && !isAppended) {
+    if (blog.headerTag && !$isHeadTagUpdated) {
       const doc = document
         .createRange()
         .createContextualFragment(blog.headerTag)
       document.head.appendChild(doc)
-      isAppended = true
+      isHeadTagUpdated.update(() => true)
     }
   }
   function clickPage (href) {

@@ -1,4 +1,7 @@
 import { gun } from './contexts'
+import { writable } from 'svelte/store'
+
+export const isHeadTagUpdated = writable(false)
 
 export const domainMap = {
   'vuau.me': {
