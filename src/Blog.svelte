@@ -59,9 +59,11 @@
 </script>
 
 <svelte:head>
+  <html lang="en" />
   <title>
     {blog ? `${blog.title}${page ? ' - ' : ''}` : ''}{page ? `${page.title}` : ''}
   </title>
+  <meta name="description" content={page ? (page.description || page.content.substring(0, 160)) : ''} />
 </svelte:head>
 
 {#if !isLoading}
