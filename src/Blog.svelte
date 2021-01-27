@@ -32,7 +32,7 @@
   })
 
   function injectHead (blog) {
-    if (blog.headerTag && !$isHeadTagUpdated) {
+    if (blog && blog.headerTag && !$isHeadTagUpdated) {
       const doc = document
         .createRange()
         .createContextualFragment(blog.headerTag)
