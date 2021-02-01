@@ -11,7 +11,7 @@
 
   onMount(async () => {
     isLoading = true
-    if (!pub) {
+    if (!pub) { // use domain
       isUseDomain = true
       const domainInfo = domainMap[location.hostname]
       if (!domainInfo) {
@@ -20,13 +20,24 @@
       }
       pub = domainInfo.pub
       slug1 = domainInfo.slug
-    }
-    if (slug1) {
-      ;({ blog, pages } = await getData({ slug: slug1, pub }))
-      injectHead(blog)
-    }
-    if (slug2) {
-      page = await getData({ slug: slug2, pub })
+      if (slug1) {
+        ;({ blog, pages } = await getData({ slug: slug1, pub }))
+        injectHead(blog)
+      }
+      if (slug2) {
+        page = await getData({ slug: slug2, pub })
+      }
+    } else { // use pub key
+      if (slug1) {
+        if (!slug2) {
+          page = await getData({ slug: slug1, pub })
+        }
+        if (slug2) {
+          ;({ blog, pages } = await getData({ slug: slug1, pub }))
+          injectHead(blog)
+          page = await getData({ slug: slug2, pub })
+        }
+      }
     }
     isLoading = false
   })
