@@ -1,56 +1,28 @@
 {
   "name": "page",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "dev": "parcel src/index.html --port 5001",
-    "now-dev": "parcel src/index.html --port $PORT",
-    "build": "rimraf dist && parcel build src/index.html",
-    "serve": "serve dist",
-    "prod": "build && serve"
+  "version": "2.0.0",
+  "description": "Public page for pen",
+  "engines": {
+    "node": "14"
   },
-  "author": "Au Pham <phamvuau@gmail.com>",
-  "license": "ISC",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
+  },
   "browserslist": [
     "defaults"
   ],
   "staticFiles": {
-    "staticPath": ["robots.txt"]
-  },
-  "svelte": {
-    "sourceMaps": true
+    "staticPath": [
+      "robots.txt"
+    ]
   },
   "devDependencies": {
-    "@gooddollar/gun": "0.2020.910",
-    "autoprefixer": "^9.7.6",
-    "babel-eslint": "^10.1.0",
-    "core-js": "^3.6.4",
-    "eslint": "^6.8.0",
-    "eslint-config-standard": "^14.1.1",
-    "eslint-plugin-import": "^2.20.2",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.1",
-    "eslint-plugin-svelte3": "^2.7.3",
-    "npm-run-all": "^4.1.5",
-    "parcel-bundler": "^1.12.4",
-    "parcel-plugin-bundle-visualiser": "^1.2.0",
-    "parcel-plugin-static-files-copy": "^2.5.0",
-    "parcel-plugin-svelte": "^4.0.6",
-    "postcss-nested": "^4.2.1",
-    "postcss-preset-env": "^6.7.0",
-    "prettier": "^2.0.5",
-    "prettier-eslint": "^11.0.0",
-    "prettier-eslint-cli": "^5.0.0",
-    "prettier-plugin-svelte": "^1.1.0",
-    "qs": "^6.9.4",
-    "regenerator-runtime": "^0.13.5",
-    "rimraf": "^3.0.2",
-    "serve": "^11.3.0",
-    "standard": "^14.3.3",
-    "svelte": "^3.20.1",
-    "svelte-routing": "^1.4.2",
-    "tachyons": "^4.11.1"
+    "vite": "^2.1.5"
+  },
+  "dependencies": {
+    "gun": "^0.2020.520",
+    "mithril": "^2.0.4"
   }
 }
