@@ -2,7 +2,7 @@ import "./style.css";
 import m from "mithril";
 import { gun, getData } from "./utils";
 
-m.route.prefix = "#";
+m.route.prefix = "";
 
 const domainMap = {
   'vuau.me': {
