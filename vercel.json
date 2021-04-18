@@ -1,8 +1,10 @@
 {
   "version": 2,
   "regions": ["sin1"],
-  "routes": [
-    { "handle": "filesystem" },
-    { "src": "/.*", "dest": "/index.html" }
+  "rewrites": [
+    {
+      "source": "/((?!@vite|main|style|utils|env|node_modules\/.*).*)",
+      "destination": "/index.html"
+    }
   ]
 }
